@@ -62,17 +62,7 @@ if __name__ == "__main__":
   main()
 
 
-
 '''
 Message ID: 19dec664e9f39add
   Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
-Message ID: 19ddb831850732fe
-  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
-Message ID: 19dc905943bfbc0c
-  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
-Message ID: 19dc859b8ec97d4f
-  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
-Message ID: 19dc387797649779
-  S
-
 '''
