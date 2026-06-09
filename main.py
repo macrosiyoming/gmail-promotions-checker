@@ -36,16 +36,22 @@ def main():
   try:
     # Call the Gmail API
     service = build("gmail", "v1", credentials=creds)
-    results = service.users().labels().list(userId="me").execute()
-    labels = results.get("labels", [])
+    results = (
+      service.users().messages().list(userId="me", labelIds=["CATEGORY_PROMOTIONS" and "UNREAD"]).execute()
+    )
+    messages = results.get("messages", [])
 
-    if not labels:
-      print("No labels found.")
+    if not messages:
+      print("No messages found.")
       return
-    print("Labels:")
-    for label in labels:
-      if label["name"] == "CATEGORY_PROMOTIONS":
-        print(label["name"])
+
+    print("Messages:")
+    for message in messages:
+      print(f'Message ID: {message["id"]}')
+      msg = (
+        service.users().messages().get(userId="me", id=message["id"]).execute()
+      )
+      print(f'  Subject: {msg["payload"]}')
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
@@ -54,3 +60,19 @@ def main():
 
 if __name__ == "__main__":
   main()
+
+
+
+'''
+Message ID: 19dec664e9f39add
+  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
+Message ID: 19ddb831850732fe
+  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
+Message ID: 19dc905943bfbc0c
+  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
+Message ID: 19dc859b8ec97d4f
+  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
+Message ID: 19dc387797649779
+  S
+
+'''
