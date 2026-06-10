@@ -18,9 +18,9 @@ Return: [{'name': 'Delivered-To', 'value': 'support@smsmycx.com'},
         {'name': 'Date', 'value': 'Thu, 04 Jun 2026 16:45:30 +0000'},
         {'name': 'Mime-Version', 'value': '1.0'},
         {'name': 'Content-Type', 'value': 'multipart/alternative; boundary="da74732d11d73137bc5a5254ea9953a9b2aaf8feb6554b71299b236b6b39"'},
-        {'name': 'Subject', 'value': 'New this month: See everywhere Apollo works'},
-        {'name': 'From', 'value': 'Apollo <hello@mail.apollo.io>'},
-        {'name': 'To', 'value': 'support@smsmycx.com'},
+        {'name': 'Subject', 'value': 'New this month: See everywhere Apollo works'}, // 18
+        {'name': 'From', 'value': 'Apollo <hello@mail.apollo.io>'}, // 19
+        {'name': 'To', 'value': 'support@smsmycx.com'}, 
         {'name': 'X-Mailgun-Native-Send', 'value': 'true'},
         {'name': 'X-Mailgun-Track-Clicks', 'value': 'false'},
         {'name': 'X-Mailgun-Track-Opens', 'value': 'false'},
