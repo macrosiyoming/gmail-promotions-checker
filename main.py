@@ -1,5 +1,6 @@
 import os.path
 import base64
+import json
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -41,26 +42,37 @@ def main():
     results = (
       service.users().messages().list(userId="me", labelIds=["CATEGORY_PROMOTIONS", "UNREAD"]).execute()
     )
-    messages = results.get("messages", [])
+    raw = results.get("messages", [])
 
-    if not messages:
+    if not raw:
       print("No messages found.")
       return
 
     print("Messages:")
-    for message in messages:
-      print(f'Message ID: {messages[0]["id"]}')
-      msg = (
-        service.users().messages().get(userId="me", id=messages[0]["id"]).execute()
-      )
-      base64Str = msg["payload"]["parts"][0]['body']['data']
-      base64Bytes = base64Str.encode()
+    messages = {}
 
-      messageBytes = base64.urlsafe_b64decode(base64Bytes)
-      finalMessage = messageBytes.decode()
+    for i, message in enumerate(raw):
+      if i != 5:
+        print(f'Message ID: {message["id"]}')
+        msg = (
+          service.users().messages().get(userId="me", id=message["id"]).execute()
+        )
+        base64Str = msg["payload"]["parts"][0]['body']['data']
+        base64Bytes = base64Str.encode()
 
-      print(f'Return: {msg["payload"].keys()}')
-      print(f'Return: {finalMessage}')
+        messageBytes = base64.urlsafe_b64decode(base64Bytes)
+        finalMessage = messageBytes.decode()
+        # sender = msg["payload"]["headers"]["name"]["from"]
+        # subject = msg["payload"]["headers"]["name"]["subject"]
+
+        messages[message["id"]] = finalMessage
+        # messages[message["id"]] = sender
+        # messages[message["id"]] = subject
+
+        print(f'Return: {msg["snippet"]}')
+    
+    with open('emails.json', 'w') as fp:
+      json.dump(messages, fp, indent=4)
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
