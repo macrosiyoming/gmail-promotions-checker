@@ -1,6 +1,7 @@
 import os.path
 import base64
 import json
+import time
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -10,7 +11,6 @@ from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
-
 
 def main():
   """Shows basic usage of the Gmail API.
@@ -48,28 +48,31 @@ def main():
       print("No messages found.")
       return
 
-    print("Messages:")
     messages = {}
 
-    for i, message in enumerate(raw):
-      if i != 5:
-        print(f'Message ID: {message["id"]}')
-        msg = (
-          service.users().messages().get(userId="me", id=message["id"]).execute()
-        )
+    for message in raw:
+      msg = (
+        service.users().messages().get(userId="me", id=message["id"]).execute()
+      )
+      if "parts" in msg["payload"]:
         base64Str = msg["payload"]["parts"][0]['body']['data']
-        base64Bytes = base64Str.encode()
+      else:
+        base64Str = msg["payload"]['body']['data']
+      base64Bytes = base64Str.encode()
 
-        messageBytes = base64.urlsafe_b64decode(base64Bytes)
-        finalMessage = messageBytes.decode()
-        # sender = msg["payload"]["headers"]["name"]["from"]
-        # subject = msg["payload"]["headers"]["name"]["subject"]
+      messageBytes = base64.urlsafe_b64decode(base64Bytes)
+      finalMessage = messageBytes.decode()
+      for i in (msg["payload"]["headers"]):
+        if i["name"] == "Subject":
+          subject = i["value"]
 
-        messages[message["id"]] = finalMessage
-        # messages[message["id"]] = sender
-        # messages[message["id"]] = subject
+      for i in (msg["payload"]["headers"]):
+        if i["name"] == "From":
+          sender = i["value"]
 
-        print(f'Return: {msg["snippet"]}')
+      messages[message["id"]] = [finalMessage, sender, subject]
+      print(f'Email listed!')
+      time.sleep(0.5)
     
     with open('emails.json', 'w') as fp:
       json.dump(messages, fp, indent=4)
