@@ -1,4 +1,5 @@
 import os.path
+import base64
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -33,11 +34,12 @@ def main():
     with open("token.json", "w") as token:
       token.write(creds.to_json())
 
+  # WHERE ALL THE CODE STARTS
   try:
     # Call the Gmail API
     service = build("gmail", "v1", credentials=creds)
     results = (
-      service.users().messages().list(userId="me", labelIds=["CATEGORY_PROMOTIONS" and "UNREAD"]).execute()
+      service.users().messages().list(userId="me", labelIds=["CATEGORY_PROMOTIONS", "UNREAD"]).execute()
     )
     messages = results.get("messages", [])
 
@@ -47,22 +49,22 @@ def main():
 
     print("Messages:")
     for message in messages:
-      print(f'Message ID: {message["id"]}')
+      print(f'Message ID: {messages[0]["id"]}')
       msg = (
-        service.users().messages().get(userId="me", id=message["id"]).execute()
+        service.users().messages().get(userId="me", id=messages[0]["id"]).execute()
       )
-      print(f'  Subject: {msg["payload"]}')
+      base64Str = msg["payload"]["parts"][0]['body']['data']
+      base64Bytes = base64Str.encode()
+
+      messageBytes = base64.urlsafe_b64decode(base64Bytes)
+      finalMessage = messageBytes.decode()
+
+      print(f'Return: {msg["payload"].keys()}')
+      print(f'Return: {finalMessage}')
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
 
-
 if __name__ == "__main__":
   main()
-
-
-'''
-Message ID: 19dec664e9f39add
-  Subject: dict_keys(['id', 'threadId', 'labelIds', 'snippet', 'payload', 'sizeEstimate', 'historyId', 'internalDate'])
-'''
