@@ -3,6 +3,6 @@
 
 TIMELINE:
 - DONE - fetch encoded email data from gmail api and store data
-- use ai api to analyze email data
+- ONGOING - use ai api to analyze email data
 - return potential savings
 - add error testcases
