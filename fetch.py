@@ -21,6 +21,8 @@ def getEmails(creds):
             return
 
         # loop raw emails
+        emailCount = 0
+
         for message in raw:
             msg = (service.users().messages().get(userId="me", id=message["id"]).execute())
 
@@ -42,9 +44,24 @@ def getEmails(creds):
             for i in (msg["payload"]["headers"]):
                 if i["name"] == "From":
                     sender = i["value"]
+            
+            '''
+            Email ID: {id}
+            Subject: {subject}
+            Sender: {sender}
+            Body: {body}
+            '''
+            messages[emailCount] = {
+                "id" : message["id"],
+                "subject" : subject,
+                "sender" : sender,
+                "body" : finalMessage
+            }
+        
+            # messages[message["id"]] = [finalMessage, sender, subject] - old format
 
-            messages[message["id"]] = [finalMessage, sender, subject]
             print(f'Email listed!')
+            emailCount += 1
             time.sleep(0.5)
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
