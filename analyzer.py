@@ -1,7 +1,9 @@
 import os
 import json
+from markdown import markdown
 
 from analyzePrompt import prompt
+from analyzePrompt2 import prompt2
 from google import genai
 from gitignore.api import GEMINI_API
 
@@ -15,7 +17,7 @@ with open('gitignore/emails.json') as user_file:
 # analysis function
 def analysis(emails):
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash",
         contents=(prompt + emails),
     )
     analyzedEmails = response.text
@@ -30,12 +32,22 @@ def analysis(emails):
     with open(json_path, 'w') as fp:
         json.dump(analyzedEmails, fp, indent=4)
 
+    print("Created analyzedEmails.json!")
+
 with open('gitignore/analyzedEmails.json') as user_file:
     analyzedEmails = user_file.read()
 
-# ONGOING - turn json dictionaries to readable human report
-# def returnText(emails):
-#     totalSavings = 
+def returnText(analyzedEmails):
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=(prompt2 + analyzedEmails),
+    )
 
-#     for i in emails:
-#         if i["has_offer"] == True:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(base_dir, "gitignore", "report.md")
+
+    # export report to external md
+    with open(json_path, 'w') as fp:
+        fp.write(response.text)
+    
+    print("Created report.md!")

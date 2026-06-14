@@ -20,49 +20,51 @@ def getEmails(creds):
             print("No messages found.")
             return
 
-        # loop raw emails
+        # limit
+        limit = 30
         emailCount = 0
 
         for message in raw:
-            msg = (service.users().messages().get(userId="me", id=message["id"]).execute())
+            if emailCount <= limit:
+                msg = (service.users().messages().get(userId="me", id=message["id"]).execute())
 
-            # encoding email to base64
-            if "parts" in msg["payload"]:
-                base64Str = msg["payload"]["parts"][0]['body']['data']
-            else:
-                base64Str = msg["payload"]['body']['data']
-            base64Bytes = base64Str.encode()
+                # encoding email to base64
+                if "parts" in msg["payload"]:
+                    base64Str = msg["payload"]["parts"][0]['body']['data']
+                else:
+                    base64Str = msg["payload"]['body']['data']
+                base64Bytes = base64Str.encode()
+                
+                # decoding base64 to actual readable email
+                messageBytes = base64.urlsafe_b64decode(base64Bytes)
+                finalMessage = messageBytes.decode()
+
+                # find subject and sender in dictionaries
+                for i in (msg["payload"]["headers"]):
+                    if i["name"] == "Subject":
+                        subject = i["value"]
+                for i in (msg["payload"]["headers"]):
+                    if i["name"] == "From":
+                        sender = i["value"]
+                
+                '''
+                Email ID: {id}
+                Subject: {subject}
+                Sender: {sender}
+                Body: {body}
+                '''
+                messages[emailCount] = {
+                    "id" : message["id"],
+                    "subject" : subject,
+                    "sender" : sender,
+                    "body" : finalMessage
+                }
             
-            # decoding base64 to actual readable email
-            messageBytes = base64.urlsafe_b64decode(base64Bytes)
-            finalMessage = messageBytes.decode()
+                # messages[message["id"]] = [finalMessage, sender, subject] - old format
 
-            # find subject and sender in dictionaries
-            for i in (msg["payload"]["headers"]):
-                if i["name"] == "Subject":
-                    subject = i["value"]
-            for i in (msg["payload"]["headers"]):
-                if i["name"] == "From":
-                    sender = i["value"]
-            
-            '''
-            Email ID: {id}
-            Subject: {subject}
-            Sender: {sender}
-            Body: {body}
-            '''
-            messages[emailCount] = {
-                "id" : message["id"],
-                "subject" : subject,
-                "sender" : sender,
-                "body" : finalMessage
-            }
-        
-            # messages[message["id"]] = [finalMessage, sender, subject] - old format
-
-            print(f'Email listed!')
-            emailCount += 1
-            time.sleep(0.5)
+                print(f'Email listed!')
+                emailCount += 1
+                time.sleep(0.5)
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
         json_path = os.path.join(base_dir, "gitignore", "emails.json")
