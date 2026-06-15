@@ -3,4 +3,5 @@ credentials.json
 emails.json
 format.txt
 api.py
+analyzedEmails.json
 report.md
